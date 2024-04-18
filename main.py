@@ -47,17 +47,19 @@ def draw(all_rects, score, hi_score):
         if rect.clicked == False:
             WIN.blit(rect.true_rect, (rect.x, rect.y))
     
+    
     # Update the screen
     pygame.display.update()
 
 # Generates Random X position
 def rand_x():
     
-    return random.randrange(0, 900,102)
+    return random.randrange(0, 900, 100)
 
 def main():
     
     # Create a rectangle object
+    # Possible alternative - Use for loop in range to create these objects and append to all_rects
     black_rect_0 = Black_Rect(VEL, rand_x(), STARTING_Y, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)
     black_rect_1 = Black_Rect(VEL, rand_x(), black_rect_0.y - BLOCK_HEIGHT -2, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)
     black_rect_2 = Black_Rect(VEL, rand_x(), black_rect_1.y - BLOCK_HEIGHT -2, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)
