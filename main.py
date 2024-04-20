@@ -1,9 +1,10 @@
 import pygame
 import os
 import random
+import keyboard
+import pyautogui
+import time
 from black_rect import Black_Rect
-pygame.init()
-
 # Screen size
 WIDTH, HEIGHT = 900, 500
 # Establish a window
@@ -19,6 +20,12 @@ VEL = 2
 BLOCK_WIDTH, BLOCK_HEIGHT = 100, 150
 STARTING_Y = BLOCK_HEIGHT * -1
 
+# Hard Mode - Faster Tiles
+HARD_MODE = True
+
+# Number of Tiles
+TILES = 5
+
 # Title
 pygame.display.set_caption("First Game")
 font = pygame.font.Font('freesansbold.ttf', 32)
@@ -27,17 +34,19 @@ true_rect = pygame.Surface((BLOCK_WIDTH, BLOCK_HEIGHT))
 
 def draw(all_rects, score, hi_score):
     
-    
+    # Set background color
+    WIN.fill(WHITE)
+        
     # Sets the font, and colors for score
     score = font.render(f"Score:{str(score)}", True, BLACK, WHITE)
     score_rect = score.get_rect()
-        
+    
+    # Sets the font, and colors for hi-score    
     hi_score = font.render(f"High Score:{str(hi_score)}", True, BLACK, WHITE)
     hi_score_rect = hi_score.get_rect()
     hi_score_rect.y = 50
      
-    # Set background color
-    WIN.fill(WHITE)
+    # Draw them on screen
     WIN.blit(score, score_rect)
     WIN.blit(hi_score, hi_score_rect)
     
@@ -53,20 +62,23 @@ def draw(all_rects, score, hi_score):
 
 # Generates Random X position
 def rand_x():
-    
     return random.randrange(0, 900, 100)
+
 
 def main():
     
-    # Create a rectangle object
-    # Possible alternative - Use for loop in range to create these objects and append to all_rects
-    black_rect_0 = Black_Rect(VEL, rand_x(), STARTING_Y, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)
-    black_rect_1 = Black_Rect(VEL, rand_x(), black_rect_0.y - BLOCK_HEIGHT -2, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)
-    black_rect_2 = Black_Rect(VEL, rand_x(), black_rect_1.y - BLOCK_HEIGHT -2, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)
-    black_rect_3 = Black_Rect(VEL, rand_x(), black_rect_2.y - BLOCK_HEIGHT-2, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)
-    black_rect_4 = Black_Rect(VEL, rand_x(), black_rect_3.y - BLOCK_HEIGHT -2, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)
-    black_rect_5 = Black_Rect(VEL, rand_x(), black_rect_4.y - BLOCK_HEIGHT -2, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)     
-    all_rects = [black_rect_0, black_rect_1, black_rect_2, black_rect_3, black_rect_4, black_rect_5]
+    # Create a list to hold all the rectangle objects
+    all_rects = []
+    # For loop to control how many tiles we want to create
+    for rect in range(0, TILES):
+        if len(all_rects) == 0:    
+            # Create a rectangle object if list is empty     
+            new_rect = Black_Rect(VEL, rand_x(), STARTING_Y, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)
+        else:
+            # Create a rectangle object with a higher starting y value than the rectangle before it
+            new_rect = Black_Rect(VEL, rand_x(), all_rects[rect-1].y - BLOCK_HEIGHT - 2, BLOCK_WIDTH, BLOCK_HEIGHT, WIN)
+        all_rects.append(new_rect)
+        
     # Controlls Score
     score = 0
     hi_score = 0
@@ -89,8 +101,7 @@ def main():
             # Resetting the rectangle to the top, should try destroying it
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                print(mouse_pos)
-                
+               #  print(mouse_pos)
                 # Every rectangle in all rects
                 for rect in all_rects:
                     # If a successful mouseclick and has not already been clicked
@@ -99,8 +110,7 @@ def main():
                         score += 1
                         # Change clicked to True
                         rect.clicked = True
-
-
+                
        # For every rectangle in all_rects
         for rect in all_rects:
             # Rate at which the block falls
@@ -119,7 +129,9 @@ def main():
                 rect.clicked = False
                 
                 # Below is challange mode
-                # rect.velocity += 1
+                if HARD_MODE == True:
+                    if rect.velocity < 7:
+                        rect.velocity += 1
                 
         if score > hi_score:
             hi_score = score
